@@ -1,0 +1,5 @@
+C:\Users\mlnas\RiderProjects\GraphAll\GraphAll\bin\Debug\GraphAll.exe
+C:\Users\mlnas\RiderProjects\GraphAll\GraphAll\bin\Debug\GraphAll.pdb
+C:\Users\mlnas\RiderProjects\GraphAll\GraphAll\obj\Debug\GraphAll.csprojAssemblyReference.cache
+C:\Users\mlnas\RiderProjects\GraphAll\GraphAll\obj\Debug\GraphAll.exe
+C:\Users\mlnas\RiderProjects\GraphAll\GraphAll\obj\Debug\GraphAll.pdb
