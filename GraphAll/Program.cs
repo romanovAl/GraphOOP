@@ -70,6 +70,13 @@ namespace GraphAll
                     Console.Write(adjMatr[i, j] + ", ");
                 }
             }
+            
+            Console.WriteLine("\n Вершина || степень - ");
+            var graphDegrees = graph.getEdgesDegrees();
+            for (int i = 0; i < graphDegrees.Count; i++)
+            {
+                Console.WriteLine(" {0} || {1}", i, graphDegrees[i]);
+            }
 
             var bfs = graph.bfs(0);
 
@@ -124,8 +131,35 @@ namespace GraphAll
             {
                 Console.Write("{0}, ",dot);
             }
+
+            int[,] graphForEuler =
             {
-                
+                {0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+                {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+                {0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+                {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+                {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                {0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0},
+                {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0},
+                {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+                {0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0}
+            };
+            
+            var exampleGraph = new Graph(graphForEuler);
+            
+            Console.WriteLine("\n Проверка другого графа на Эйлеровость - \n");
+            
+            Console.Write("Граф Эйлеров - " + exampleGraph.isGraphEuler());
+            
+            Console.Write("\n Эйлеров цикл - \n");
+
+            foreach (var v in exampleGraph.getEulerCycle())
+            {
+                Console.Write("{0}, ", v);
             }
         }
     }
@@ -187,36 +221,6 @@ class Graph
 
     }
     
-    public int[,] getGraphAsAdjacencyMatrixWithPass(int pass)
-    {
-        if (_adjMatr != null)
-        {
-            return _adjMatr;
-        }
-
-        var length = _dots.Length;
-
-        var result = new int[length, length];
-
-        for (var i = 0; i < _dots.Length; i++)
-        {
-            if (i == pass) continue;
-            
-            for (var j = 0; j < _dots[i].Length; j++)
-            {
-                var ind = _dots[i][j];
-                result[i, ind] = 1;
-            }
-
-
-        }
-
-        _adjMatr = result;
-
-        return _adjMatr;
-
-    }
-
     public List<int> bfs(int u)
     {
         var adjacencyMatrix = getGraphAsAdjacencyMatrix();
@@ -447,5 +451,100 @@ class Graph
         dfsToFindHinges(s);
 
         return hingesSet.ToList();
+    }
+    
+    public Dictionary<int, int> getEdgesDegrees()
+    { 
+        var adjMatr = getGraphAsAdjacencyMatrix();
+        
+        var degrees = new Dictionary<int,int>();
+
+        for (int i = 0; i < adjMatr.GetLength(0); i++)
+        {
+            var degree = 0;
+            for (int j = 0; j < adjMatr.GetLength(0); j++)
+            {
+                if (adjMatr[i, j] != 0) degree++;
+            }
+            
+            degrees.Add(i,degree);
+        }
+
+        return degrees;
+    }
+
+    public bool isGraphEuler()
+    {
+        var degrees = getEdgesDegrees();
+
+        foreach (var degree in degrees.Values)
+        {
+            if (degree % 2 != 0) return false;
+        }
+
+        return true;
+    }
+
+    public List<int> getEulerCycle()
+    {
+        var cur = 0;
+        
+        var eulerCycle = new List<int>();
+        
+        var stack = new Stack<int>();
+        stack.Push(cur);
+
+        while (stack.Count != 0)
+        {
+            cur = stack.Peek();
+
+            var nei = edgeHasNeighbor(cur);
+
+            if (nei != -1)
+            {
+                stack.Push(nei);
+            }
+            else
+            {
+                stack.Pop();
+                eulerCycle.Add(cur);
+            }
+        }
+
+        return eulerCycle;
+    }
+
+    private int[,] graphCopy;
+    
+    private int edgeHasNeighbor(int edge)
+    {
+
+        if (graphCopy == null)
+        {
+            graphCopy = getGraphAsAdjacencyMatrix();
+            for (int i = 0; i < graphCopy.GetLength(0); i++)
+            {
+                if (graphCopy[edge, i] != 0)
+                {
+                    graphCopy[edge, i] = 0;
+                    graphCopy[i, edge] = 0;
+                    return i;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < graphCopy.GetLength(0); i++)
+            {
+                if (graphCopy[edge, i] != 0)
+                {
+                    graphCopy[edge, i] = 0;
+                    graphCopy[i, edge] = 0;
+                    return i;
+                }
+            }
+        }
+
+        return -1;
     }
 }
